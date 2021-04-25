@@ -21,6 +21,7 @@
 #include <errno.h>
 
 #include "dsp/samplesourcefifo.h"
+#include "hackrf/devicehackrf.h"
 
 HackRFOutputThread::HackRFOutputThread(hackrf_device* dev, SampleSourceFifo* sampleFifo, QObject* parent) :
 	QThread(parent),
@@ -28,9 +29,19 @@ HackRFOutputThread::HackRFOutputThread(hackrf_device* dev, SampleSourceFifo* sam
 	m_dev(dev),
 	m_sampleFifo(sampleFifo),
 	m_log2Interp(0),
-    m_fcPos(2)
+    m_fcPos(2),
+    m_markTxOnCount(-1),
+    m_markTxOffCount(-1)
 {
     std::fill(m_buf, m_buf + 2*HACKRF_BLOCKSIZE, 0);
+
+    QObject::connect(
+        this,
+        &HackRFOutputThread::signalTxEnable,
+        this,
+        &HackRFOutputThread::enableTx,
+        Qt::QueuedConnection
+    );
 }
 
 HackRFOutputThread::~HackRFOutputThread()
@@ -63,6 +74,19 @@ void HackRFOutputThread::setLog2Interpolation(unsigned int log2Interp)
 void HackRFOutputThread::setFcPos(int fcPos)
 {
 	m_fcPos = fcPos;
+}
+
+void HackRFOutputThread::markTx(bool enable)
+{
+    int nbChunks = (0.8192f * m_sampleRate) / 131072.0f;
+    qDebug("HackRFOutputThread::markTx: m_sampleRate: %d nbChumks: %d enable: %s",
+        m_sampleRate, nbChunks, enable ? "on" : "off");
+
+    if (enable) {
+        m_markTxOnCount = nbChunks;
+    } else {
+        m_markTxOffCount = nbChunks + 2;
+    }
 }
 
 void HackRFOutputThread::run()
@@ -112,6 +136,7 @@ void HackRFOutputThread::run()
         }
     }
 
+    DeviceHackRF::setMixers(m_dev, true); // restore mixer state
 	m_running = false;
 }
 
@@ -130,6 +155,22 @@ void HackRFOutputThread::callback(qint8* buf, qint32 len)
 
     if (iPart2Begin != iPart2End) {
         callbackPart(buf + 2*shift, data, iPart2Begin, iPart2End);
+    }
+
+    if (m_markTxOnCount >= 0) {
+        m_markTxOnCount--;
+    }
+
+    if (m_markTxOffCount >= 0) {
+        m_markTxOffCount--;
+    }
+
+    if (m_markTxOnCount == 0) {
+        emit signalTxEnable(true);
+    }
+
+    if (m_markTxOffCount == 0) {
+        emit signalTxEnable(false);
     }
 }
 
@@ -230,5 +271,14 @@ int HackRFOutputThread::tx_callback(hackrf_transfer* transfer)
     HackRFOutputThread *thread = (HackRFOutputThread *) transfer->tx_ctx;
     qint32 bytes_to_write = transfer->valid_length;
 	thread->callback((qint8 *) transfer->buffer, bytes_to_write);
-	return 0;
+    return 0;
+}
+
+void HackRFOutputThread::enableTx(bool on)
+{
+    if (m_dev)
+    {
+        // qDebug("HackRFOutputThread::enableTx: %s", on ? "on" : "off");
+        DeviceHackRF::setMixers(m_dev, on);
+    }
 }

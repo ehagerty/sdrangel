@@ -42,6 +42,7 @@ HackRFOutput::HackRFOutput(DeviceAPI *deviceAPI) :
 	m_settings(),
 	m_dev(nullptr),
 	m_hackRFThread(nullptr),
+    m_deviceSampleRate(1),
 	m_deviceDescription("HackRFOutput"),
 	m_running(false)
 {
@@ -136,6 +137,7 @@ bool HackRFOutput::start()
 
     m_hackRFThread->setLog2Interpolation(m_settings.m_log2Interp);
     m_hackRFThread->setFcPos((int) m_settings.m_fcPos);
+    m_hackRFThread->setSampleRate(m_deviceSampleRate);
 
 	m_hackRFThread->startWork();
 
@@ -167,14 +169,21 @@ void HackRFOutput::stop()
 	qDebug("HackRFOutput::stop");
 //	QMutexLocker mutexLocker(&m_mutex);
 
-	if(m_hackRFThread != 0)
+	if (m_hackRFThread)
 	{
 		m_hackRFThread->stopWork();
 		delete m_hackRFThread;
-		m_hackRFThread = 0;
+		m_hackRFThread = nullptr;
 	}
 
 	m_running = false;
+}
+
+void HackRFOutput::enableTx(bool tx)
+{
+    if (m_hackRFThread) {
+        m_hackRFThread->markTx(tx);
+    }
 }
 
 QByteArray HackRFOutput::serialize() const
@@ -372,10 +381,15 @@ bool HackRFOutput::applySettings(const HackRFOutputSettings& settings, bool forc
     if ((m_settings.m_devSampleRate != settings.m_devSampleRate) || (m_settings.m_log2Interp != settings.m_log2Interp) || force)
     {
         forwardChange = true;
+        m_deviceSampleRate = settings.m_devSampleRate;
         unsigned int fifoRate = std::max(
             (unsigned int) settings.m_devSampleRate / (1<<settings.m_log2Interp),
             DeviceHackRFShared::m_sampleFifoMinRate);
         m_sampleSourceFifo.resize(SampleSourceFifo::getSizePolicy(fifoRate));
+
+        if (m_hackRFThread) {
+            m_hackRFThread->setSampleRate(m_deviceSampleRate);
+        }
     }
 
 	if ((m_settings.m_devSampleRate != settings.m_devSampleRate) || force)
@@ -464,7 +478,7 @@ bool HackRFOutput::applySettings(const HackRFOutputSettings& settings, bool forc
 	{
         reverseAPIKeys.append("vgaGain");
 
-		if (m_dev != 0)
+		if (m_dev)
 		{
 			rc = (hackrf_error) hackrf_set_txvga_gain(m_dev, settings.m_vgaGain);
 
@@ -513,7 +527,7 @@ bool HackRFOutput::applySettings(const HackRFOutputSettings& settings, bool forc
 	{
         reverseAPIKeys.append("lnaExt");
 
-		if (m_dev != 0)
+		if (m_dev)
 		{
 			rc = (hackrf_error) hackrf_set_amp_enable(m_dev, (settings.m_lnaExt ? 1 : 0));
 

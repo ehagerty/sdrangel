@@ -50,6 +50,7 @@ public:
     virtual void init() = 0;  //!< initializations to be done when all collaborating objects are created and possibly connected
 	virtual bool start() = 0;
 	virtual void stop() = 0;
+    virtual void enableTx(bool tx) { (void) tx; } //!< enable/disaable RF without stopping Tx thread - may be implemented or not
 
     virtual QByteArray serialize() const = 0;
     virtual bool deserialize(const QByteArray& data) = 0;

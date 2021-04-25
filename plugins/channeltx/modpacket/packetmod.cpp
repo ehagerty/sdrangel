@@ -69,6 +69,7 @@ PacketMod::PacketMod(DeviceAPI *deviceAPI) :
     m_basebandSource = new PacketModBaseband();
     m_basebandSource->setSpectrumSampleSink(&m_spectrumVis);
     m_basebandSource->setChannel(this);
+    m_basebandSource->setDeviceAPI(deviceAPI);
     m_basebandSource->moveToThread(m_thread);
 
     applySettings(m_settings, true);

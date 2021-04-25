@@ -102,6 +102,7 @@ public:
     virtual void init();
 	virtual bool start();
 	virtual void stop();
+	virtual void enableTx(bool tx);
 
     virtual QByteArray serialize() const;
     virtual bool deserialize(const QByteArray& data);
@@ -149,6 +150,7 @@ private:
 	HackRFOutputSettings m_settings;
 	struct hackrf_device* m_dev;
 	HackRFOutputThread* m_hackRFThread;
+	int m_deviceSampleRate;
 	QString m_deviceDescription;
 	DeviceHackRFParams m_sharedParams;
     QNetworkAccessManager *m_networkManager;

@@ -21,6 +21,9 @@
 
 #include "dsp/basebandsamplesink.h"
 #include "dsp/datafifo.h"
+#include "dsp/dspdevicesinkengine.h"
+#include "dsp/devicesamplesink.h"
+#include "device/deviceapi.h"
 #include "packetmodsource.h"
 #include "util/crc.h"
 #include "util/messagequeue.h"
@@ -31,6 +34,8 @@ PacketModSource::PacketModSource() :
     m_channelSampleRate(48000),
     m_channelFrequencyOffset(0),
     m_spectrumRate(0),
+    m_deviceAPI(nullptr),
+    m_deviceOn(false),
     m_audioPhase(0.0f),
     m_fmPhase(0.0),
     m_preemphasisFilter(48000, FMPREEMPHASIS_TAU_US),
@@ -80,6 +85,23 @@ void PacketModSource::pullOne(Sample& sample)
         sample.m_real = 0.0f;
         sample.m_imag = 0.0f;
         return;
+    }
+
+    if ((m_state == idle) || (m_state == wait))
+    {
+        if (m_deviceOn && m_deviceAPI)
+        {
+            m_deviceAPI->getDeviceSinkEngine()->getSink()->enableTx(false);
+            m_deviceOn = false;
+        }
+    }
+    else
+    {
+        if (!m_deviceOn && m_deviceAPI)
+        {
+            m_deviceAPI->getDeviceSinkEngine()->getSink()->enableTx(true);
+            m_deviceOn = true;
+        }
     }
 
     // Calculate next sample

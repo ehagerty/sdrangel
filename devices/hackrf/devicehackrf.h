@@ -31,6 +31,7 @@ public:
     static hackrf_device *open_hackrf(const char * const serial);
     static void enumOriginDevices(const QString& hardwareId, PluginInterface::OriginDevices& originDevices);
     static void setDevicePPMCorrection(hackrf_device *dev, qint32 loPPMTenths);
+    static void setMixers(hackrf_device *dev, bool on); //!< set RFFC5071 mixers on or off (enables/disables RF input/output)
 protected:
     DeviceHackRF();
     DeviceHackRF(const DeviceHackRF&) {}

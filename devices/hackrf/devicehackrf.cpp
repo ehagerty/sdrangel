@@ -244,3 +244,18 @@ void DeviceHackRF::setDevicePPMCorrection(hackrf_device *dev, qint32 loPPMTenths
         qDebug() << "DeviceHackRF::setDevicePPMCorrection: XTAL error adjusted by" << (loPPMTenths / 10.0f) << "PPM.";
     }
 }
+
+void DeviceHackRF::setMixers(hackrf_device *dev, bool on)
+{
+    if (!dev) {
+        return;
+    }
+
+    hackrf_error rc = HACKRF_SUCCESS;
+
+    rc = (hackrf_error) hackrf_rffc5071_write(dev, 11, on ? 0x4800 : 0);
+
+    if (rc != HACKRF_SUCCESS) {
+        qDebug("DeviceHackRF::setMixers: hackrf_rffc5071_write reg 11 failed: %s", hackrf_error_name(rc));
+    }
+}

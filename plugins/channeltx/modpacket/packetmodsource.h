@@ -46,6 +46,7 @@
 
 class BasebandSampleSink;
 class ChannelAPI;
+class DeviceAPI;
 
 class PacketModSource : public ChannelSampleSource
 {
@@ -71,6 +72,7 @@ public:
     void addTXPacket(QByteArray data);
     void encodePacket(uint8_t *packet, int packet_length, uint8_t *crc_start, uint8_t *packet_end);
     void setChannel(ChannelAPI *channel) { m_channel = channel; }
+    void setDeviceAPI(DeviceAPI *deviceAPI) { m_deviceAPI = deviceAPI; }
 
 private:
     int m_channelSampleRate;
@@ -78,6 +80,9 @@ private:
     int m_spectrumRate;
     PacketModSettings m_settings;
     ChannelAPI *m_channel;
+
+    DeviceAPI* m_deviceAPI;
+    bool m_deviceOn;
 
     NCO m_carrierNco;
     Real m_audioPhase;

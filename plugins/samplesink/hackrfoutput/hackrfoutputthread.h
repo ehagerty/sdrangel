@@ -40,7 +40,12 @@ public:
 	void startWork();
 	void stopWork();
 	void setLog2Interpolation(unsigned int log2_interp);
+	void setSampleRate(int sampleRate) { m_sampleRate = sampleRate; }
     void setFcPos(int fcPos);
+	void markTx(bool enable);
+
+signals:
+	void signalTxEnable(bool on);
 
 private:
 	QMutex m_startWaitMutex;
@@ -53,6 +58,9 @@ private:
 
 	unsigned int m_log2Interp;
     int m_fcPos;
+	int m_markTxOnCount;
+	int m_markTxOffCount;
+	int m_sampleRate;
 
     Interpolators<qint8, SDR_TX_SAMP_SZ, 8> m_interpolators;
 
@@ -60,6 +68,9 @@ private:
 	void callback(qint8* buf, qint32 len);
     void callbackPart(qint8* buf, SampleVector& data, unsigned int iBegin, unsigned int iEnd);
 	static int tx_callback(hackrf_transfer* transfer);
+
+private slots:
+    void enableTx(bool on);
 };
 
 #endif // INCLUDE_HACKRFOUTPUTTHREAD_H
