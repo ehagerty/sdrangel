@@ -63,6 +63,8 @@ DeviceReport:
       $ref: "http://swgserver:8081/api/swagger/include/USRP.yaml#/USRPInputReport"
     usrpOutputReport:
       $ref: "http://swgserver:8081/api/swagger/include/USRP.yaml#/USRPOutputReport"
+    usrpMIMOReport:
+      $ref: "http://swgserver:8081/api/swagger/include/USRP.yaml#/USRPMIMOReport"
     xtrxInputReport:
       $ref: "http://swgserver:8081/api/swagger/include/Xtrx.yaml#/XtrxInputReport"
     xtrxOutputReport:

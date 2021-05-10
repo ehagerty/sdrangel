@@ -63,6 +63,8 @@ DeviceReport:
       $ref: "/doc/swagger/include/USRP.yaml#/USRPInputReport"
     usrpOutputReport:
       $ref: "/doc/swagger/include/USRP.yaml#/USRPOutputReport"
+    usrpMIMOReport:
+      $ref: "/doc/swagger/include/USRP.yaml#/USRPMIMOReport"
     xtrxInputReport:
       $ref: "/doc/swagger/include/Xtrx.yaml#/XtrxInputReport"
     xtrxOutputReport:

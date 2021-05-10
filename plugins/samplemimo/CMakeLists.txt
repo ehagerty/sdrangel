@@ -16,6 +16,10 @@ if(ENABLE_IIO AND LIBIIO_FOUND)
     add_subdirectory(plutosdrmimo)
 endif()
 
+if(ENABLE_USRP AND UHD_FOUND)
+    add_subdirectory(usrpmimo)
+endif()
+
 add_subdirectory(metismiso)
 add_subdirectory(testmi)
 add_subdirectory(testmosync)

@@ -75,6 +75,105 @@ USRPOutputSettings:
     reverseAPIDeviceIndex:
       type: integer
 
+USRPMIMOSettings:
+  description: USRP
+  properties:
+    devSampleRate:
+      type: integer
+    clockSource:
+      type: string
+    rxCenterFrequency:
+      type: integer
+      format: int64
+    dcBlock:
+      type: integer
+    iqCorrection:
+      type: integer
+    log2SoftDecim:
+      type: integer
+    fcPosRx:
+      type: integer
+      description: >
+        Center of reception shift
+          * 0 - Infra
+          * 1 - Supra
+          * 2 - Center
+    rxTransverterMode:
+      type: integer
+    rxTransverterDeltaFrequency:
+      type: integer
+      format: int64
+    iqOrder:
+      type: integer
+      description: >
+        IQ samples order
+          * 0 - Q then I (swapped)
+          * 1 - I then Q (straight)
+    rx0LOOffset:
+      type: integer
+    rx0LpfBW:
+      type: integer
+    rx0AntennaPath:
+      type: string
+    rx0Gain:
+      type: integer
+    rx0GainMode:
+      description: 0 for auto, 1 for manual
+      type: integer
+    rx1LOOffset:
+      type: integer
+    rx1LpfBW:
+      type: integer
+    rx1AntennaPath:
+      type: string
+    rx1Gain:
+      type: integer
+    rx1GainMode:
+      description: 0 for auto, 1 for manual
+      type: integer
+    txCenterFrequency:
+      type: integer
+      format: int64
+    log2SoftInterp:
+      type: integer
+    fcPosTx:
+      type: integer
+      description: >
+        Center of transmission shift
+          * 0 - Infra
+          * 1 - Supra
+          * 2 - Center
+    txTransverterMode:
+      type: integer
+    txTransverterDeltaFrequency:
+      type: integer
+      format: int64
+    tx0LOOffset:
+      type: integer
+    tx0LpfBW:
+      type: integer
+    tx0Gain:
+      type: integer
+    tx0AntennaPath:
+      type: string
+    tx1LOOffset:
+      type: integer
+    tx1LpfBW:
+      type: integer
+    tx1Gain:
+      type: integer
+    tx1AntennaPath:
+      type: string
+    useReverseAPI:
+      description: Synchronize with reverse API (1 for yes, 0 for no)
+      type: integer
+    reverseAPIAddress:
+      type: string
+    reverseAPIPort:
+      type: integer
+    reverseAPIDeviceIndex:
+      type: integer
+
 USRPInputReport:
   description: USRP
   properties:
@@ -101,4 +200,28 @@ USRPOutputReport:
     underrunCount:
       type: integer
     droppedPacketsCount:
+      type: integer
+
+USRPMIMOReport:
+  description: USRP
+  properties:
+    rxSuccess:
+      description: 1 if info was successfully retrieved else 0
+      type: integer
+    rxStreamActive:
+      description: 1 if active else 0
+      type: integer
+    rxOverrunCount:
+      type: integer
+    rxTimeoutCount:
+      type: integer
+    txSuccess:
+      description: 1 if info was successfully retrieved else 0
+      type: integer
+    txStreamActive:
+      description: 1 if active else 0
+      type: integer
+    txUnderrunCount:
+      type: integer
+    txDroppedPacketsCount:
       type: integer

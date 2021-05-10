@@ -110,6 +110,8 @@ SWGDeviceSettings::SWGDeviceSettings() {
     m_usrp_input_settings_isSet = false;
     usrp_output_settings = nullptr;
     m_usrp_output_settings_isSet = false;
+    usrp_mimo_settings = nullptr;
+    m_usrp_mimo_settings_isSet = false;
     xtrx_input_settings = nullptr;
     m_xtrx_input_settings_isSet = false;
     xtrx_output_settings = nullptr;
@@ -206,6 +208,8 @@ SWGDeviceSettings::init() {
     m_usrp_input_settings_isSet = false;
     usrp_output_settings = new SWGUSRPOutputSettings();
     m_usrp_output_settings_isSet = false;
+    usrp_mimo_settings = new SWGUSRPMIMOSettings();
+    m_usrp_mimo_settings_isSet = false;
     xtrx_input_settings = new SWGXtrxInputSettings();
     m_xtrx_input_settings_isSet = false;
     xtrx_output_settings = new SWGXtrxOutputSettings();
@@ -335,6 +339,9 @@ SWGDeviceSettings::cleanup() {
     if(usrp_output_settings != nullptr) { 
         delete usrp_output_settings;
     }
+    if(usrp_mimo_settings != nullptr) { 
+        delete usrp_mimo_settings;
+    }
     if(xtrx_input_settings != nullptr) { 
         delete xtrx_input_settings;
     }
@@ -438,6 +445,8 @@ SWGDeviceSettings::fromJsonObject(QJsonObject &pJson) {
     ::SWGSDRangel::setValue(&usrp_input_settings, pJson["usrpInputSettings"], "SWGUSRPInputSettings", "SWGUSRPInputSettings");
     
     ::SWGSDRangel::setValue(&usrp_output_settings, pJson["usrpOutputSettings"], "SWGUSRPOutputSettings", "SWGUSRPOutputSettings");
+    
+    ::SWGSDRangel::setValue(&usrp_mimo_settings, pJson["usrpMIMOSettings"], "SWGUSRPMIMOSettings", "SWGUSRPMIMOSettings");
     
     ::SWGSDRangel::setValue(&xtrx_input_settings, pJson["xtrxInputSettings"], "SWGXtrxInputSettings", "SWGXtrxInputSettings");
     
@@ -583,6 +592,9 @@ SWGDeviceSettings::asJsonObject() {
     }
     if((usrp_output_settings != nullptr) && (usrp_output_settings->isSet())){
         toJsonValue(QString("usrpOutputSettings"), usrp_output_settings, obj, QString("SWGUSRPOutputSettings"));
+    }
+    if((usrp_mimo_settings != nullptr) && (usrp_mimo_settings->isSet())){
+        toJsonValue(QString("usrpMIMOSettings"), usrp_mimo_settings, obj, QString("SWGUSRPMIMOSettings"));
     }
     if((xtrx_input_settings != nullptr) && (xtrx_input_settings->isSet())){
         toJsonValue(QString("xtrxInputSettings"), xtrx_input_settings, obj, QString("SWGXtrxInputSettings"));
@@ -1007,6 +1019,16 @@ SWGDeviceSettings::setUsrpOutputSettings(SWGUSRPOutputSettings* usrp_output_sett
     this->m_usrp_output_settings_isSet = true;
 }
 
+SWGUSRPMIMOSettings*
+SWGDeviceSettings::getUsrpMimoSettings() {
+    return usrp_mimo_settings;
+}
+void
+SWGDeviceSettings::setUsrpMimoSettings(SWGUSRPMIMOSettings* usrp_mimo_settings) {
+    this->usrp_mimo_settings = usrp_mimo_settings;
+    this->m_usrp_mimo_settings_isSet = true;
+}
+
 SWGXtrxInputSettings*
 SWGDeviceSettings::getXtrxInputSettings() {
     return xtrx_input_settings;
@@ -1163,6 +1185,9 @@ SWGDeviceSettings::isSet(){
             isObjectUpdated = true; break;
         }
         if(usrp_output_settings && usrp_output_settings->isSet()){
+            isObjectUpdated = true; break;
+        }
+        if(usrp_mimo_settings && usrp_mimo_settings->isSet()){
             isObjectUpdated = true; break;
         }
         if(xtrx_input_settings && xtrx_input_settings->isSet()){

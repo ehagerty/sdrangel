@@ -90,6 +90,8 @@ DeviceSettings:
       $ref: "/doc/swagger/include/USRP.yaml#/USRPInputSettings"
     usrpOutputSettings:
       $ref: "/doc/swagger/include/USRP.yaml#/USRPOutputSettings"
+    usrpMIMOSettings:
+      $ref: "/doc/swagger/include/USRP.yaml#/USRPMIMOSettings"
     xtrxInputSettings:
       $ref: "/doc/swagger/include/Xtrx.yaml#/XtrxInputSettings"
     xtrxOutputSettings:

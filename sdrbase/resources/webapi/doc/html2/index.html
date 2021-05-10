@@ -4006,6 +4006,9 @@ margin-bottom: 20px;
     "usrpOutputReport" : {
       "$ref" : "#/definitions/USRPOutputReport"
     },
+    "usrpMIMOReport" : {
+      "$ref" : "#/definitions/USRPMIMOReport"
+    },
     "xtrxInputReport" : {
       "$ref" : "#/definitions/XtrxInputReport"
     },
@@ -4187,6 +4190,9 @@ margin-bottom: 20px;
     },
     "usrpOutputSettings" : {
       "$ref" : "#/definitions/USRPOutputSettings"
+    },
+    "usrpMIMOSettings" : {
+      "$ref" : "#/definitions/USRPMIMOSettings"
     },
     "xtrxInputSettings" : {
       "$ref" : "#/definitions/XtrxInputSettings"
@@ -7922,6 +7928,19 @@ margin-bottom: 20px;
     },
     "tx1AntennaPath" : {
       "type" : "integer"
+    },
+    "useReverseAPI" : {
+      "type" : "integer",
+      "description" : "Synchronize with reverse API (1 for yes, 0 for no)"
+    },
+    "reverseAPIAddress" : {
+      "type" : "string"
+    },
+    "reverseAPIPort" : {
+      "type" : "integer"
+    },
+    "reverseAPIDeviceIndex" : {
+      "type" : "integer"
     }
   },
   "description" : "PlutoSDR"
@@ -10753,6 +10772,165 @@ margin-bottom: 20px;
     "transverterDeltaFrequency" : {
       "type" : "integer",
       "format" : "int64"
+    },
+    "useReverseAPI" : {
+      "type" : "integer",
+      "description" : "Synchronize with reverse API (1 for yes, 0 for no)"
+    },
+    "reverseAPIAddress" : {
+      "type" : "string"
+    },
+    "reverseAPIPort" : {
+      "type" : "integer"
+    },
+    "reverseAPIDeviceIndex" : {
+      "type" : "integer"
+    }
+  },
+  "description" : "USRP"
+};
+            defs.USRPMIMOReport = {
+  "properties" : {
+    "rxSuccess" : {
+      "type" : "integer",
+      "description" : "1 if info was successfully retrieved else 0"
+    },
+    "rxStreamActive" : {
+      "type" : "integer",
+      "description" : "1 if active else 0"
+    },
+    "rxOverrunCount" : {
+      "type" : "integer"
+    },
+    "rxTimeoutCount" : {
+      "type" : "integer"
+    },
+    "txSuccess" : {
+      "type" : "integer",
+      "description" : "1 if info was successfully retrieved else 0"
+    },
+    "txStreamActive" : {
+      "type" : "integer",
+      "description" : "1 if active else 0"
+    },
+    "txUnderrunCount" : {
+      "type" : "integer"
+    },
+    "txDroppedPacketsCount" : {
+      "type" : "integer"
+    }
+  },
+  "description" : "USRP"
+};
+            defs.USRPMIMOSettings = {
+  "properties" : {
+    "devSampleRate" : {
+      "type" : "integer"
+    },
+    "clockSource" : {
+      "type" : "string"
+    },
+    "rxCenterFrequency" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "dcBlock" : {
+      "type" : "integer"
+    },
+    "iqCorrection" : {
+      "type" : "integer"
+    },
+    "log2SoftDecim" : {
+      "type" : "integer"
+    },
+    "fcPosRx" : {
+      "type" : "integer",
+      "description" : "Center of reception shift\n  * 0 - Infra\n  * 1 - Supra\n  * 2 - Center\n"
+    },
+    "rxTransverterMode" : {
+      "type" : "integer"
+    },
+    "rxTransverterDeltaFrequency" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "iqOrder" : {
+      "type" : "integer",
+      "description" : "IQ samples order\n  * 0 - Q then I (swapped)\n  * 1 - I then Q (straight)\n"
+    },
+    "rx0LOOffset" : {
+      "type" : "integer"
+    },
+    "rx0LpfBW" : {
+      "type" : "integer"
+    },
+    "rx0AntennaPath" : {
+      "type" : "string"
+    },
+    "rx0Gain" : {
+      "type" : "integer"
+    },
+    "rx0GainMode" : {
+      "type" : "integer",
+      "description" : "0 for auto, 1 for manual"
+    },
+    "rx1LOOffset" : {
+      "type" : "integer"
+    },
+    "rx1LpfBW" : {
+      "type" : "integer"
+    },
+    "rx1AntennaPath" : {
+      "type" : "string"
+    },
+    "rx1Gain" : {
+      "type" : "integer"
+    },
+    "rx1GainMode" : {
+      "type" : "integer",
+      "description" : "0 for auto, 1 for manual"
+    },
+    "txCenterFrequency" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "log2SoftInterp" : {
+      "type" : "integer"
+    },
+    "fcPosTx" : {
+      "type" : "integer",
+      "description" : "Center of transmission shift\n  * 0 - Infra\n  * 1 - Supra\n  * 2 - Center\n"
+    },
+    "txTransverterMode" : {
+      "type" : "integer"
+    },
+    "txTransverterDeltaFrequency" : {
+      "type" : "integer",
+      "format" : "int64"
+    },
+    "tx0LOOffset" : {
+      "type" : "integer"
+    },
+    "tx0LpfBW" : {
+      "type" : "integer"
+    },
+    "tx0Gain" : {
+      "type" : "integer"
+    },
+    "tx0AntennaPath" : {
+      "type" : "string"
+    },
+    "tx1LOOffset" : {
+      "type" : "integer"
+    },
+    "tx1LpfBW" : {
+      "type" : "integer"
+    },
+    "tx1Gain" : {
+      "type" : "integer"
+    },
+    "tx1AntennaPath" : {
+      "type" : "string"
     },
     "useReverseAPI" : {
       "type" : "integer",
@@ -46268,7 +46446,7 @@ except ApiException as e:
           </div>
           <div id="generator">
             <div class="content">
-              Generated 2021-04-29T21:19:02.297+02:00
+              Generated 2021-05-10T17:05:02.329+02:00
             </div>
           </div>
       </div>
