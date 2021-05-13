@@ -256,10 +256,7 @@
      <item>
       <layout class="QVBoxLayout" name="freqLeftLayout">
        <item>
-        <layout class="QHBoxLayout" name="freqLeftTopLayout"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="freqLeftBotLayout">
+        <layout class="QHBoxLayout" name="freqLeftTopLayout">
          <item>
           <widget class="QLabel" name="masterClockRateLabel">
            <property name="toolTip">
@@ -268,8 +265,15 @@
            <property name="text">
             <string>00000k</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
           </widget>
          </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="freqLeftBotLayout">
          <item>
           <widget class="QLabel" name="sampleRateLabel">
            <property name="minimumSize">

@@ -38,7 +38,7 @@ class USRPMIThread : public QThread
     Q_OBJECT
 
 public:
-    USRPMIThread(uhd::rx_streamer::sptr stream, int bufSamples, QObject* parent = nullptr);
+    USRPMIThread(const uhd::usrp::multi_usrp::sptr& usrp, uhd::rx_streamer::sptr stream, int bufSamples, QObject* parent = nullptr);
     ~USRPMIThread();
 
     void startWork();
@@ -63,9 +63,10 @@ private:
     quint32 m_overflows;
     quint32 m_timeouts;
 
+    uhd::usrp::multi_usrp::sptr m_usrp;
     uhd::rx_streamer::sptr m_stream;
     size_t m_bufSamples; //!< USRP buffer size i.e. max number of samples per buffer per packet (given by parent).
-    qint16 *m_buf[2]; //!< one buffer per I/Q channel
+    std::vector<void*> m_buffs; //!< one buffer per I/Q channel
 	SampleVector m_convertBuffer[2];
     SampleMIFifo *m_sampleFifo;
     Decimators<qint32, qint16, SDR_RX_SAMP_SZ, 12, true> m_decimatorsIQ[2];
@@ -73,6 +74,7 @@ private:
     unsigned int m_log2Decim;
     int m_fcPos;
     bool m_iqOrder;
+    double m_timeout;
 
     void resetStats();
     void run();

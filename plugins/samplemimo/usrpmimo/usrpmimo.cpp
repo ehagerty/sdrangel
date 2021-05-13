@@ -129,6 +129,7 @@ bool USRPMIMO::startRx()
     }
 
 	QMutexLocker mutexLocker(&m_mutex);
+    uhd::usrp::multi_usrp::sptr usrp = m_deviceParams->getDevice();
 
     if (m_runningRx) {
         stopRx();
@@ -138,7 +139,6 @@ bool USRPMIMO::startRx()
     {
         try
         {
-            uhd::usrp::multi_usrp::sptr usrp = m_deviceParams->getDevice();
 
             // Apply settings before creating stream
             // However, don't set LPF to <10MHz at this stage, otherwise there is massive TX LO leakage
@@ -156,7 +156,7 @@ bool USRPMIMO::startRx()
             uhd::stream_args_t stream_args(cpu_format, wire_format);
             stream_args.channels = channel_nums;
 
-            m_rxStream = m_deviceParams->getDevice()->get_rx_stream(stream_args);
+            m_rxStream = usrp->get_rx_stream(stream_args);
 
             // Match our receive buffer size to what UHD uses
             m_rxBufSamples = m_rxStream->get_max_num_samps();
@@ -175,7 +175,7 @@ bool USRPMIMO::startRx()
         }
     }
 
-    m_sourceThread = new USRPMIThread(m_rxStream, m_rxBufSamples);
+    m_sourceThread = new USRPMIThread(usrp, m_rxStream, m_rxBufSamples);
     m_sampleMIFifo.reset();
     m_sourceThread->setFifo(&m_sampleMIFifo);
     m_sourceThread->setFcPos(m_settings.m_fcPosRx);
@@ -1581,4 +1581,66 @@ void USRPMIMO::networkManagerFinished(QNetworkReply *reply)
     }
 
     reply->deleteLater();
+}
+
+void USRPMIMO::getSRRange(float& minF, float& maxF) const
+{
+    minF = m_deviceParams->m_srRangeRx.start();
+    maxF = m_deviceParams->m_srRangeRx.stop();
+}
+
+QStringList USRPMIMO::getClockSources() const
+{
+    return m_deviceParams->m_clockSources;
+}
+
+void USRPMIMO::getRxLORange(float& minF, float& maxF) const
+{
+    minF = m_deviceParams->m_loRangeRx.start();
+    maxF = m_deviceParams->m_loRangeRx.stop();
+}
+
+void USRPMIMO::getRxLPRange(float& minF, float& maxF) const
+{
+    minF = m_deviceParams->m_lpfRangeRx.start();
+    maxF = m_deviceParams->m_lpfRangeRx.stop();
+}
+
+void USRPMIMO::getRxGainRange(float& minF, float& maxF) const
+{
+    minF = m_deviceParams->m_gainRangeRx.start();
+    maxF = m_deviceParams->m_gainRangeRx.stop();
+}
+
+QStringList USRPMIMO::getRxAntennas() const
+{
+    return m_deviceParams->m_rxAntennas;
+}
+
+QStringList USRPMIMO::getRxGainNames() const
+{
+    return m_deviceParams->m_rxGainNames;
+}
+
+void USRPMIMO::getTxLORange(float& minF, float& maxF) const
+{
+    minF = m_deviceParams->m_loRangeTx.start();
+    maxF = m_deviceParams->m_loRangeTx.stop();
+}
+
+void USRPMIMO::getTxLPRange(float& minF, float& maxF) const
+{
+    minF = m_deviceParams->m_lpfRangeTx.start();
+    maxF = m_deviceParams->m_lpfRangeTx.stop();
+}
+
+void USRPMIMO::getTxGainRange(float& minF, float& maxF) const
+{
+    minF = m_deviceParams->m_gainRangeTx.start();
+    maxF = m_deviceParams->m_gainRangeTx.stop();
+}
+
+QStringList USRPMIMO::getTxAntennas() const
+{
+    return m_deviceParams->m_txAntennas;
 }

@@ -20,22 +20,24 @@
 
 #include "usrpmithread.h"
 
-USRPMIThread::USRPMIThread(uhd::rx_streamer::sptr stream, int bufSamples, QObject* parent) :
+USRPMIThread::USRPMIThread(const uhd::usrp::multi_usrp::sptr& usrp, uhd::rx_streamer::sptr stream, int bufSamples, QObject* parent) :
     QThread(parent),
     m_running(false),
     m_packets(0),
     m_overflows(0),
     m_timeouts(0),
+    m_usrp(usrp), // gets a copy of the shared ptr
     m_stream(stream),
     m_bufSamples(bufSamples),
     m_sampleFifo(nullptr),
-    m_iqOrder(true)
+    m_iqOrder(true),
+    m_timeout(2.0)
 {
     qDebug("USRPMIThread::USRPMIThread");
 
     for (unsigned int i = 0; i < 2; i++)
     {
-        m_buf[i] = new qint16[2*m_bufSamples]; // *2 as samples are I+Q
+        m_buffs.push_back(new qint16[2*m_bufSamples]); // *2 as samples are I+Q
         m_convertBuffer[i].resize(m_bufSamples, Sample{0,0});
     }
 
@@ -51,7 +53,7 @@ USRPMIThread::~USRPMIThread()
     }
 
     for (unsigned int i = 0; i < 2; i++) {
-        delete[] m_buf[i];
+        delete[] (qint16*) m_buffs[i];
     }
 }
 
@@ -115,7 +117,7 @@ void USRPMIThread::stopWork()
             try
             {
                 md.reset();
-                m_stream->recv(m_buf, m_bufSamples, md);
+                m_stream->recv(m_buffs, m_bufSamples, md);
             }
             catch (std::exception& e)
             {
@@ -161,10 +163,11 @@ void USRPMIThread::getStreamStatus(bool& active, quint32& overflows, quint32& ti
 
 void USRPMIThread::issueStreamCmd(bool start)
 {
-    uhd::stream_cmd_t stream_cmd(start ? uhd::stream_cmd_t::STREAM_MODE_START_CONTINUOUS : uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS);
-    stream_cmd.num_samps = size_t(0);
-    stream_cmd.stream_now = true;
-    stream_cmd.time_spec = uhd::time_spec_t();
+    uhd::stream_cmd_t stream_cmd(start ? uhd::stream_cmd_t::STREAM_MODE_NUM_SAMPS_AND_DONE : uhd::stream_cmd_t::STREAM_MODE_STOP_CONTINUOUS);
+    stream_cmd.num_samps = size_t(10000000);
+    stream_cmd.stream_now = false;
+    stream_cmd.time_spec = uhd::time_spec_t(2.0);
+    m_timeout = 2.1;
 
     m_stream->issue_stream_cmd(stream_cmd);
     qDebug() << "USRPMIThread::issueStreamCmd " << (start ? "start" : "stop");
@@ -183,13 +186,15 @@ void USRPMIThread::run()
 
     m_running = true;
     m_startWaiter.wakeAll();
+    m_usrp->set_time_now(uhd::time_spec_t(0.0));
 
     try
     {
         while (m_running)
         {
             md.reset();
-            const size_t samples_received = m_stream->recv(m_buf, m_bufSamples, md);
+            const size_t samples_received = m_stream->recv(m_buffs, m_bufSamples, md, m_timeout);
+            m_timeout = 0.1;
 
             m_packets++;
 
@@ -232,13 +237,13 @@ void USRPMIThread::run()
             {
                 if (m_iqOrder)
                 {
-                    channelCallbackIQ(m_buf[0], 2 * samples_received, 0);
-                    channelCallbackIQ(m_buf[1], 2 * samples_received, 1);
+                    channelCallbackIQ((qint16*) m_buffs[0], 2 * samples_received, 0);
+                    channelCallbackIQ((qint16*) m_buffs[1], 2 * samples_received, 1);
                 }
                 else
                 {
-                    channelCallbackQI(m_buf[0], 2 * samples_received, 0);
-                    channelCallbackQI(m_buf[1], 2 * samples_received, 1);
+                    channelCallbackQI((qint16*) m_buffs[0], 2 * samples_received, 0);
+                    channelCallbackQI((qint16*) m_buffs[1], 2 * samples_received, 1);
                 }
             }
         }

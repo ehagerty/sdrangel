@@ -257,14 +257,12 @@ public:
     void getSRRange(float& minF, float& maxF) const;
     QStringList getClockSources() const;
 
-    std::size_t getRxChannelIndex();
     void getRxLORange(float& minF, float& maxF) const;
     void getRxLPRange(float& minF, float& maxF) const;
     void getRxGainRange(float& minF, float& maxF) const;
     QStringList getRxAntennas() const;
     QStringList getRxGainNames() const;
 
-    std::size_t getTxChannelIndex();
     void getTxLORange(float& minF, float& maxF) const;
     void getTxLPRange(float& minF, float& maxF) const;
     void getTxGainRange(float& minF, float& maxF) const;
