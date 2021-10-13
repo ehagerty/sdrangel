@@ -21,7 +21,7 @@ jobs:
             QT_ARCH: win64_msvc2019_64,
             build_type: "Release",
             archiver: "7z a",
-            CMAKE_GENERATOR: Ninja,
+            generators: Ninja,
             CMAKE_CUSTOM_OPTIONS: "-DCMAKE_BUILD_TYPE=Release \
                                   -DARCH_OPT=nehalem \
                                   -DDEBUG_OUTPUT=ON \
@@ -43,17 +43,24 @@ jobs:
           choco install ninja cmake
           ninja --version
           cmake --version
+      - name: Install MSVC on Windows
+        if: startsWith(matrix.config.os, 'windows')
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          toolset: 16.XX
       - name: Install Qt
         uses: jurplel/install-qt-action@v2.14.0
         with:
           dir: ${{matrix.config.QT_INST_DIR}}
           arch: ${{matrix.config.QT_ARCH}}
-          version: ${{env.QT_VERSION}}
+          setup-python: false
+          modules: 'qtcharts'
       - name: build sdrangel on Windows
         if: startsWith(matrix.config.os, 'windows')
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           choco install patch
           mkdir build && cd build
-          cmake .. -G "{{ matrix.config.CMAKE_GENERATOR }}" {{ matrix.config.CMAKE_CUSTOM_OPTIONS }}
+          cmake .. -G "${{ matrix.config.generators }}" ${{ matrix.config.CMAKE_CUSTOM_OPTIONS }}
           cmake --build . --config ${{ matrix.config.Release }} --target package
